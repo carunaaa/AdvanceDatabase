@@ -1,0 +1,46 @@
+CREATE TABLE Employee (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(50),
+    Occupation VARCHAR(50),
+    WorkingDate DATE,
+    WorkingHour INT
+);
+
+
+DELIMITER //
+
+CREATE TRIGGER before_employee_insert
+BEFORE INSERT ON Employee
+FOR EACH ROW
+BEGIN
+    IF NEW.WorkingHour < 0 THEN
+        SET NEW.WorkingHour = 0;
+    END IF;
+END//
+
+DELIMITER ;
+
+
+-- Insert sample data
+INSERT INTO Employee (Name, Occupation, WorkingDate, WorkingHour) VALUES
+('Alice', 'Engineer', '2024-06-01', 8),
+('Bob', 'Teacher', '2024-06-02', -5),  -- This should be set to 0 by the trigger
+('Charlie', 'Doctor', '2024-06-03', 10),
+('Diana', 'Lawyer', '2024-06-04', -3), -- This should be set to 0 by the trigger
+('Eve', 'Nurse', '2024-06-05', 7);
+
+
+SELECT * FROM Employee;
+
+
+
+Expected outcome:
++----+---------+-----------+-------------+-------------+
+| ID | Name    | Occupation| WorkingDate | WorkingHour |
++----+---------+-----------+-------------+-------------+
+|  1 | Alice   | Engineer  | 2024-06-01  |           8 |
+|  2 | Bob     | Teacher   | 2024-06-02  |           0 |  -- Adjusted by the trigger
+|  3 | Charlie | Doctor    | 2024-06-03  |          10 |
+|  4 | Diana   | Lawyer    | 2024-06-04  |           0 |  -- Adjusted by the trigger
+|  5 | Eve     | Nurse     | 2024-06-05  |           7 |
++----+---------+-----------+-------------+-------------+
